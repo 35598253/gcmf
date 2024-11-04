@@ -1,9 +1,9 @@
 package gcmf
 
 import (
-	"admin/hack/gcmf/email"
-	"admin/hack/gcmf/sign"
-	"admin/hack/gcmf/ztcms"
+	"github.com/35598253/gcmf/email"
+	"github.com/35598253/gcmf/sign"
+	"github.com/35598253/gcmf/ztcms"
 	"unicode/utf8"
 
 	"github.com/gogf/gf/v2/i18n/gi18n"

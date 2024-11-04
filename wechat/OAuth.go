@@ -1,8 +1,8 @@
 package wechat
 
 import (
-	"admin/hack/gcmf"
-	"admin/internal/service"
+	"github.com/35598253/gcmf"
+
 	"context"
 	"errors"
 	"fmt"
@@ -123,8 +123,8 @@ func (o *oauth) GetAccessToken(Ctx context.Context, code string) (*AccessTokenRe
 }
 
 // GetUserInfo 获取AccessToken
-func (o *oauth) GetUserInfo(Ctx context.Context, accessToken, openId string) (*UserInfoRes, error) {
-	lang := service.BizCtx().Get(Ctx).Lang
+func (o *oauth) GetUserInfo(Ctx context.Context, accessToken, openId, lang string) (*UserInfoRes, error) {
+
 	value := g.Map{
 		"access_token": accessToken,
 		"openid":       openId,

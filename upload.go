@@ -1,9 +1,9 @@
 package gcmf
 
 import (
-	gcmf "admin/hack/gcmf/image"
 	"context"
 	"fmt"
+	gcmf "github.com/35598253/gcmf/image"
 	"path"
 	"strings"
 	"time"

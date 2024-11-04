@@ -1,10 +1,10 @@
 package qq
 
 import (
-	"admin/hack/gcmf"
 	"context"
 	"errors"
 	"fmt"
+	"github.com/35598253/gcmf"
 	"net/url"
 
 	"github.com/gogf/gf/v2/encoding/gjson"
