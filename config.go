@@ -1,9 +1,9 @@
 package gcmf
 
 import (
-	"admin/hack/gcmf/email"
-	"admin/hack/gcmf/ztcms"
 	"context"
+	"github.com/35598253/gcmf/email"
+	"github.com/35598253/gcmf/ztcms"
 	"os"
 
 	"github.com/gogf/gf/v2/frame/g"

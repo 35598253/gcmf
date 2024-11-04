@@ -1,7 +1,6 @@
 package gcmf
 
 import (
-	"admin/internal/consts"
 	"image"
 	"image/color"
 	"image/draw"
@@ -14,8 +13,8 @@ import (
 
 const fontSize = 16
 
-func (s *imgFile) TextWater(Text string) (*imgFile, error) {
-	textPath := "./" + consts.StaticPath + "watermark/font/text.ttc"
+func (s *imgFile) TextWater(StaticPath, Text string) (*imgFile, error) {
+	textPath := "./" + StaticPath + "watermark/font/text.ttc"
 	bound := s.Img.Bounds()
 	W := bound.Dx()
 	H := bound.Dy()

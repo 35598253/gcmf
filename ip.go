@@ -1,10 +1,10 @@
 package gcmf
 
 import (
-	"admin/hack/gcmf/Ip2Info"
 	"context"
 	"errors"
 	"fmt"
+	"github.com/35598253/gcmf/Ip2Info"
 	"net"
 	"time"
 
