@@ -1,4 +1,4 @@
-module gcmf
+module github.com/35598253/gcmf
 
 go 1.23
 
