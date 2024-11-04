@@ -1,4 +1,17 @@
-# Gcmf-Admin 使用文档
+# Gcmf 使用文档
+
+# 安装
+
+
+## 直接安装
+```
+go get -u -v github.com/35598253/gcmf
+```
+
+## 推荐使用 go.mod:
+```
+require github.com/35598253/gcmf latest
+```
 
 
 # 程序编译
