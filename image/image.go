@@ -33,7 +33,7 @@ type imgFile struct {
 
 // OutImage 导出接口
 type OutImage interface {
-	TextWater(Text string) (*imgFile, error)
+	TextWater(Text string, FontPath ...string) (*imgFile, error)
 	ImgWater(logoPath string, size uint) (*imgFile, error)
 	ToFile(RootPath, outPath string) (string, error)
 	ToBase64() (string, error)
@@ -48,13 +48,13 @@ func NewImageFile(imgPath string) (OutImage, error) {
 	defer func() {
 		_ = img.Close()
 	}()
-	_img, exts, err := image.Decode(img)
+	_img, _ext, err := image.Decode(img)
 	if err != nil {
 		return nil, err
 	}
 	return &imgFile{
 		Img: _img,
-		Ext: exts,
+		Ext: _ext,
 	}, nil
 }
 func NewImageUpload(UpImg *ghttp.UploadFile, imgResize uint) (OutImage, error) {

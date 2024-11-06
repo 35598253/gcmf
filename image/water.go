@@ -13,8 +13,11 @@ import (
 
 const fontSize = 16
 
-func (s *imgFile) TextWater(StaticPath, Text string) (*imgFile, error) {
-	textPath := "./" + StaticPath + "watermark/font/text.ttc"
+func (s *imgFile) TextWater(Text string, FontPath ...string) (*imgFile, error) {
+	fontPath := "text.ttc"
+	if len(FontPath) > 0 {
+		fontPath = FontPath[0]
+	}
 	bound := s.Img.Bounds()
 	W := bound.Dx()
 	H := bound.Dy()
@@ -25,7 +28,7 @@ func (s *imgFile) TextWater(StaticPath, Text string) (*imgFile, error) {
 
 	dc := gg.NewContextForImage(s.Img)
 
-	if err := dc.LoadFontFace(textPath, float64(rd*fontSize)); err != nil {
+	if err := dc.LoadFontFace(fontPath, float64(rd*fontSize)); err != nil {
 		return nil, err
 	}
 	fontColor := color.RGBA{R: 255, G: 255, B: 255, A: 0xff}
