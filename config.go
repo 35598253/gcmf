@@ -4,11 +4,12 @@ import (
 	"context"
 	"github.com/35598253/gcmf/email"
 	"github.com/35598253/gcmf/ztcms"
+	"github.com/gogf/gf/v2/os/gcfg"
+
 	"os"
+	"strings"
 
 	"github.com/gogf/gf/v2/frame/g"
-
-	"github.com/gogf/gf/v2/os/gfile"
 
 	"github.com/gogf/gf/v2/util/gconv"
 
@@ -68,7 +69,15 @@ type GoogleCC struct {
 
 func GetConfig(Ctx context.Context) (config Config, err error) {
 
-	t := gfile.IsFile("./config/gcmf.toml")
+	//配置存在,但选项没有
+	res, err := g.Cfg("gcmf").Data(Ctx)
+	if err == nil {
+		_ = gconv.Structs(res, &config)
+		return
+	}
+	cfgPath, _ := g.Cfg().GetAdapter().(*gcfg.AdapterFile).GetFilePath()
+	gcmfPath := strings.Replace(cfgPath, "config.toml", "gcmf.toml", 1)
+
 	_upload := &UploadConfig{
 		FileConfig: &FileUpCfg{
 			Exts:    "jpg|jpeg|gif|png|zip|7z|doc|docx|mp3|mp4|avi|mpg|mov|rm|rmvb|wps|txt|xlsx|xls|ppt|pptx",
@@ -122,27 +131,19 @@ func GetConfig(Ctx context.Context) (config Config, err error) {
 		},
 		Template: &ETemplate{Yzm: ""},
 	}
-	//配置文件文件不存在
-	if !t {
-		//写入默认配置
-		buf, err := os.Create("./config/gcmf.toml")
-		if err != nil {
-			return config, err
-		}
-		config = Config{Upload: _upload, Oauth: _oauth, Sms: _sms, Email: _email}
 
-		if err := toml.NewEncoder(buf).Encode(config); err != nil {
-			return config, err
-		}
-		defer buf.Close()
-
-		return config, nil
+	//写入默认配置
+	buf, err := os.Create(gcmfPath)
+	if err != nil {
+		return config, err
 	}
+	config = Config{Upload: _upload, Oauth: _oauth, Sms: _sms, Email: _email}
 
-	//配置存在,但选项没有
-	res, _ := g.Cfg("gcmf").Data(Ctx)
+	if err := toml.NewEncoder(buf).Encode(config); err != nil {
+		return config, err
+	}
+	defer buf.Close()
 
-	_ = gconv.Structs(res, &config)
+	return config, nil
 
-	return
 }
