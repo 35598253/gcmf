@@ -1,4 +1,4 @@
-package gcmf
+package image
 
 import (
 	"bytes"
@@ -33,7 +33,7 @@ type imgFile struct {
 
 // OutImage 导出接口
 type OutImage interface {
-	TextWater(Text string, FontPath ...string) (*imgFile, error)
+	TextWater(Text string, FontPath string) (*imgFile, error)
 	ImgWater(logoPath string, size uint) (*imgFile, error)
 	ToFile(RootPath, outPath string) (string, error)
 	ToBase64() (string, error)

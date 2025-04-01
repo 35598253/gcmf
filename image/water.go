@@ -1,4 +1,4 @@
-package gcmf
+package image
 
 import (
 	"image"
@@ -13,11 +13,8 @@ import (
 
 const fontSize = 16
 
-func (s *imgFile) TextWater(Text string, FontPath ...string) (*imgFile, error) {
-	fontPath := "text.ttc"
-	if len(FontPath) > 0 {
-		fontPath = FontPath[0]
-	}
+func (s *imgFile) TextWater(Text, fontPath string) (*imgFile, error) {
+
 	bound := s.Img.Bounds()
 	W := bound.Dx()
 	H := bound.Dy()

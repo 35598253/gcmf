@@ -3,7 +3,8 @@ package gcmf
 import (
 	"context"
 	"fmt"
-	gcmf "github.com/35598253/gcmf/image"
+	"github.com/35598253/gcmf/image"
+
 	"path"
 	"strings"
 	"time"
@@ -17,63 +18,74 @@ type Outfile struct {
 	URL     string `json:"url"`
 	Size    int64  `json:"size"`
 }
-type UploadCfg struct {
-	FileExts    string `json:"fileExts"`
-	ImgExts     string `json:"imgExts"`
-	MaxSize     int64  `json:"maxSize"`
-	ImageResize uint   `json:"imageResize"`
+type FileUpCfg struct {
+	Exts    string `json:"exts"`
+	MaxSize int64  `json:"maxSize"`
 }
-type uploadConfig struct {
-	RealPath  string `json:"realPath"`
-	Url       string `json:"url"`
-	UploadDir string `json:"uploadDir"`
-	*UploadCfg
+type ImageUpCfg struct {
+	Exts        string `json:"exts"`
+	ImageResize uint   `json:"imageResize"`
+	FontPath    string `json:"fontPath"`
+	ImageWater  string `json:"imageWater"`
+}
+type UploadConfig struct {
+	RealPath    string      `json:"realPath"`
+	Url         string      `json:"url"`
+	UploadDir   string      `json:"uploadDir"`
+	FileConfig  *FileUpCfg  `json:"fileConfig"`
+	ImageConfig *ImageUpCfg `json:"imageConfig"`
 }
 
 type Uploader interface {
 	File(UpFile *ghttp.UploadFile) (*Outfile, error)
-	Image(UpImg *ghttp.UploadFile, WaterMark string) (*Outfile, error)
+	Image(UpImg *ghttp.UploadFile) (*Outfile, error)
 }
 
 // Upload file
-func Upload(Ctx context.Context, RealPath, UploadDir, Url string, UpCfg ...*UploadCfg) Uploader {
+func Upload(Ctx context.Context, UpCfg ...*UploadConfig) Uploader {
 	cfg, _ := GetConfig(Ctx)
 
-	_cfg := &uploadConfig{
-		RealPath:  RealPath,
-		Url:       Url,
-		UploadDir: UploadDir,
-	}
-	if len(UpCfg) > 0 && UpCfg[0] != nil {
+	_cfgUp := cfg.Upload
+
+	if len(UpCfg) > 0 {
 		dfCfg := UpCfg[0]
 
-		if dfCfg.ImgExts == "" {
-			dfCfg.ImgExts = cfg.Upload.ImgExts
+		if dfCfg.ImageConfig != nil {
+			if dfCfg.ImageConfig.Exts != "" {
+				_cfgUp.ImageConfig.Exts = dfCfg.ImageConfig.Exts
+			}
+			if dfCfg.ImageConfig.ImageResize > 0 {
+				_cfgUp.ImageConfig.ImageResize = dfCfg.ImageConfig.ImageResize
+			}
+			if dfCfg.ImageConfig.FontPath != "" {
+				_cfgUp.ImageConfig.FontPath = dfCfg.ImageConfig.FontPath
+			}
+			if dfCfg.ImageConfig.ImageWater != "" {
+				_cfgUp.ImageConfig.ImageWater = dfCfg.ImageConfig.ImageWater
+			}
 		}
-		if dfCfg.FileExts == "" {
-			dfCfg.FileExts = cfg.Upload.FileExts
+		if dfCfg.FileConfig != nil {
+			if dfCfg.FileConfig.Exts != "" {
+				_cfgUp.FileConfig.Exts = dfCfg.FileConfig.Exts
+			}
+			if dfCfg.FileConfig.MaxSize > 0 {
+				_cfgUp.FileConfig.MaxSize = dfCfg.FileConfig.MaxSize
+			}
 		}
-		if dfCfg.ImageResize == 0 {
-			dfCfg.ImageResize = cfg.Upload.ImageResize
-		}
-		if dfCfg.MaxSize == 0 {
-			dfCfg.MaxSize = cfg.Upload.MaxSize
-		}
-		_cfg.UploadCfg = dfCfg
 	}
 
-	return _cfg
+	return _cfgUp
 }
 
 // File 上传文件
-func (u *uploadConfig) File(UpFile *ghttp.UploadFile) (*Outfile, error) {
+func (u *UploadConfig) File(UpFile *ghttp.UploadFile) (*Outfile, error) {
 	var tPath = fmt.Sprintf("/file/%s/%s/", u.UploadDir, time.Now().Format("2006"))
 	var upPath = u.RealPath + tPath
 	var outPath = u.Url + tPath
 
 	// 读取默认
 
-	if err := checkFile(UpFile, u.FileExts, u.MaxSize); err != nil {
+	if err := checkFile(UpFile, u.FileConfig.Exts, u.FileConfig.MaxSize); err != nil {
 		return nil, err
 	}
 	// 保存附件
@@ -86,21 +98,18 @@ func (u *uploadConfig) File(UpFile *ghttp.UploadFile) (*Outfile, error) {
 }
 
 // Image 图片上传
-func (u *uploadConfig) Image(UpImg *ghttp.UploadFile, WaterMark string) (*Outfile, error) {
+func (u *UploadConfig) Image(UpImg *ghttp.UploadFile) (*Outfile, error) {
 
-	if err := checkFile(UpImg, u.ImgExts, u.MaxSize); err != nil {
-		return nil, err
-	}
 	imgOutPath := fmt.Sprintf("/images/%s/%s/", u.UploadDir, time.Now().Format("2006"))
 	// 剪裁&水印
-	imgTmp, err := gcmf.NewImageUpload(UpImg, u.ImageResize)
+	imgTmp, err := image.NewImageUpload(UpImg, u.ImageConfig.ImageResize)
 	if err != nil {
 		return nil, err
 	}
 	var _tPath string
-	if WaterMark != "" {
+	if u.ImageConfig.ImageWater != "" {
 
-		_tImg, err := imgTmp.TextWater(WaterMark)
+		_tImg, err := imgTmp.TextWater(u.ImageConfig.ImageWater, u.ImageConfig.FontPath)
 		if err != nil {
 			return nil, err
 		}

@@ -16,7 +16,7 @@ import (
 )
 
 type Config struct {
-	Upload UploadCfg
+	Upload *UploadConfig
 	Ip     IpConfig
 	Email  EmailConfig
 	Oauth  OauthConfig
@@ -69,11 +69,17 @@ type GoogleCC struct {
 func GetConfig(Ctx context.Context) (config Config, err error) {
 
 	t := gfile.IsFile("./config/gcmf.toml")
-	_upload := UploadCfg{
-		FileExts:    "jpg|jpeg|gif|png|zip|7z|doc|docx|mp3|mp4|avi|mpg|mov|rm|rmvb|wps|txt|xlsx|xls|ppt|pptx",
-		ImgExts:     "jpg|jpeg|gif|png",
-		MaxSize:     8 * 1024 * 1024,
-		ImageResize: 1920,
+	_upload := &UploadConfig{
+		FileConfig: &FileUpCfg{
+			Exts:    "jpg|jpeg|gif|png|zip|7z|doc|docx|mp3|mp4|avi|mpg|mov|rm|rmvb|wps|txt|xlsx|xls|ppt|pptx",
+			MaxSize: 8 * 1024 * 1024,
+		},
+		ImageConfig: &ImageUpCfg{
+			Exts:        "jpg|jpeg|gif|png",
+			ImageResize: 1920,
+			ImageWater:  "",
+			FontPath:    "/resource/watermark/font/text.ttc",
+		},
 	}
 
 	//_email := EmailConfig{
